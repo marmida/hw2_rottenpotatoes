@@ -8,7 +8,12 @@ gem 'rails', '3.1.0'
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
   gem 'sqlite3'
+
+  # hacked to fix ruby-debug version errors; see: 
+  # http://stackoverflow.com/questions/8251349/ruby-threadptr-data-type-error
+  gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
   gem 'ruby-debug19', :require => 'ruby-debug'
+  gem 'linecache19', :git => 'git://github.com/mark-moseley/linecache'
 end
 group :production do
   gem 'pg'
