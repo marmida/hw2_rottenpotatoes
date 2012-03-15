@@ -9,8 +9,14 @@ class MoviesController < ApplicationController
   def index
     # display a list of movies
     @order_by = (['title', 'release_date'].member? params[:o]) && params[:o] || 'title'
-
-    @movies = Movie.order(@order_by).all
+    @all_ratings = Movie.all_ratings
+    @ratings = params['ratings']
+    # todo: fix this repetition
+    if params.member?('ratings')
+      @movies = Movie.order(@order_by).find_all_by_rating(params['ratings'].keys)
+    else
+      @movies = Movie.order(@order_by).all
+    end
   end
 
   def new
