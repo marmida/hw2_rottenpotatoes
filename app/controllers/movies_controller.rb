@@ -7,7 +7,10 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    # display a list of movies
+    @order_by = (['title', 'release_date'].member? params[:o]) && params[:o] || 'title'
+
+    @movies = Movie.order(@order_by).all
   end
 
   def new
