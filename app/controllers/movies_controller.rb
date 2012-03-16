@@ -8,15 +8,33 @@ class MoviesController < ApplicationController
 
   def index
     # display a list of movies
-    @order_by = (['title', 'release_date'].member? params[:o]) && params[:o] || 'title'
+    if !(params['o'] || params['ratings'])
+      # load last values from session
+      order_by, ratings = session['order_by'], session['ratings']
+      if order_by || ratings
+        # redirect to regular URI; otherwise, they have nothing stored, so there's no point.
+        redirect_to movies_path({'o' => order_by, 'ratings' => ratings}) and return
+      end
+    else
+      # fetch from params
+      order_by, ratings = params['o'], params['ratings']
+    end
+
+    # sanitize @order_by and @ratings
+    @order_by = ((['title', 'release_date'].member? order_by) && order_by) || 'title'
+    @ratings = (ratings && ratings.select {|k, v| Movie.all_ratings.member? k}) || {}
+
     @all_ratings = Movie.all_ratings
-    @ratings = params['ratings']
     # todo: fix this repetition
-    if params.member?('ratings')
-      @movies = Movie.order(@order_by).find_all_by_rating(params['ratings'].keys)
+    if ! @ratings.empty?
+      @movies = Movie.order(@order_by).find_all_by_rating(@ratings.keys)
     else
       @movies = Movie.order(@order_by).all
     end
+
+    # save last params into session
+    session['order_by'] = @order_by
+    session['ratings'] = @ratings
   end
 
   def new
